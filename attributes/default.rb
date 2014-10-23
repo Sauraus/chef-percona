@@ -184,7 +184,7 @@ unless attribute?(node["percona"]["backup"]["password"])
   default["percona"]["backup"]["password"] = secure_password
 end
 
-# XtraDB Cluster Settings
+default["percona"]["cluster"]["package"] = "Percona-XtraDB-Cluster-#{version.tr(".", "")}"
 default["percona"]["cluster"]["binlog_format"] = "ROW"
 default["percona"]["cluster"]["wsrep_provider"] = value_for_platform_family(
   "debian" => "/usr/lib/libgalera_smm.so",
