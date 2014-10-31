@@ -32,6 +32,7 @@ end
 
 # Cookbook Settings
 <<<<<<< HEAD
+<<<<<<< HEAD
 default["percona"]["main_config_file"] = value_for_platform_family(
   "debian" => "/etc/mysql/my.cnf",
   "rhel" => "/etc/my.cnf"
@@ -45,7 +46,7 @@ default["percona"]["encrypted_data_bag_item_ssl_replication"] = "ssl_replication
 default["percona"]["use_chef_vault"] = false
 default["percona"]["skip_passwords"] = false
 default["percona"]["skip_configure"] = false
-default["percona"]["enable_pamauth"] = true
+default["percona"]["enable_pamauth"] = false
 
 # Start percona server on boot
 default["percona"]["server"]["enable"] = true
