@@ -33,6 +33,7 @@ end
 # Cookbook Settings
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 default["percona"]["main_config_file"] = value_for_platform_family(
   "debian" => "/etc/mysql/my.cnf",
   "rhel" => "/etc/my.cnf"
