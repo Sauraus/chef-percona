@@ -36,6 +36,7 @@ default["percona"]["encrypted_data_bag"]                        = "passwords"
 default["percona"]["encrypted_data_bag_secret_file"]            = ""
 default["percona"]["skip_passwords"]                            = false
 default["percona"]["skip_configure"]                            = false
+default["percona"]["enable_pamauth"]                            = true
 
 # Start percona server on boot
 default["percona"]["server"]["enable"]                          = true
