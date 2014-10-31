@@ -1,0 +1,7 @@
+#
+# This file was created by Chef and will be overwritten on the next chef-client run
+# DO NOT MODIFY BY HAND!!
+#
+auth       required     pam_warn.so
+auth       required     pam_unix.so audit
+account    required     pam_unix.so audit
