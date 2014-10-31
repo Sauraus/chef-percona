@@ -43,3 +43,7 @@ unless node["percona"]["skip_passwords"]
   include_recipe "percona::access_grants"
   include_recipe "percona::replication"
 end
+
+if node["percona"]['enable_pamauth']
+  include_recipe "percona::pam_auth"
+end
