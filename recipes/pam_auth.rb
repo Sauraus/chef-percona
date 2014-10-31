@@ -5,14 +5,14 @@
 
 passwords = EncryptedPasswords.new(node, node["percona"]["encrypted_data_bag"])
 
-file "/etc/pam.d/mysqld" do
+cookbook_file "/etc/pam.d/mysqld" do
   source "mysqld"
   owner "root"
   group "root"
   mode "0644"
 end
 
-file "/etc/mysql/pam_auth.sql" do
+cookbook_file "/etc/mysql/pam_auth.sql" do
   source "pam_auth.sql"
   owner "root"
   group "root"
