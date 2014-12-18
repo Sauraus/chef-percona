@@ -49,4 +49,4 @@ end
 # access grants
 include_recipe "percona::access_grants" unless node["percona"]["skip_passwords"]
 # pam_auth config
-include_recile "percona::pam_auth" if node["percona"]["enable_pamauth"]
+include_recipe "percona::pam_auth" if node["percona"]["enable_pamauth"]
