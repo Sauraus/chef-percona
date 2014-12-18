@@ -10,6 +10,7 @@ cookbook_file "/etc/pam.d/mysqld" do
   owner "root"
   group "root"
   mode "0644"
+  action :create_if_missing
 end
 
 cookbook_file "/etc/mysql/pam_auth.sql" do
@@ -17,6 +18,7 @@ cookbook_file "/etc/mysql/pam_auth.sql" do
   owner "root"
   group "root"
   mode "0600"
+  action :create_if_missing
 end
 
 # execute access pam_auth
