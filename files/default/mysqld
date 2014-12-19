@@ -3,5 +3,10 @@
 # DO NOT MODIFY BY HAND!!
 #
 auth       required     pam_warn.so
-auth       required     pam_unix.so audit
-account    required     pam_unix.so audit
+auth       include      system-auth audit
+account    required     pam_nologin.so
+account    include      system-auth
+password   include      system-auth audit
+session    optional     pam_keyinit.so force revoke
+session    include      system-auth
+session    required     pam_loginuid.so

@@ -9,7 +9,6 @@ include_recipe "percona::package_repo"
 case node["platform_family"]
 when "debian"
   package node["percona"]["server"]["package"] do
-    action :install
     options "--force-yes"
   end
 when "rhel"
@@ -22,9 +21,7 @@ when "rhel"
   # we need mysqladmin
   include_recipe "percona::client"
 
-  package node["percona"]["server"]["package"] do
-    action :install
-  end
+  package node["percona"]["server"]["package"]
 end
 
 if node["percona"]["server"]["jemalloc"]
@@ -46,6 +43,4 @@ unless node["percona"]["skip_passwords"]
   include_recipe "percona::replication"
 end
 
-if node["percona"]['enable_pamauth']
-  include_recipe "percona::pam_auth"
-end
+include_recipe "percona::pam_auth" if node["percona"]["enable_pamauth"]

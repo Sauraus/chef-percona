@@ -36,6 +36,7 @@ end
 datadir           = mysqld["datadir"] || server["datadir"]
 logdir            = mysqld["logdir"] || server["logdir"]
 tmpdir            = mysqld["tmpdir"] || server["tmpdir"]
+includedir        = mysqld["includedir"] || server["includedir"]
 user              = mysqld["username"] || server["username"]
 slow_query_logdir = mysqld["slow_query_logdir"] || server["slow_query_logdir"]
 
@@ -67,6 +68,15 @@ directory tmpdir do
   recursive true
 end
 
+# setup the configuration include directory
+unless includedir.empty?  # ~FC023
+  directory includedir do # don't evaluate an empty `directory` resource
+    owner user
+    group user
+    recursive true
+  end
+end
+
 # setup slow_query_logdir directory
 directory slow_query_logdir do
   owner user
@@ -82,8 +92,9 @@ end
 
 # install db to the data directory
 execute "setup mysql datadir" do
-  command "mysql_install_db --user=#{user} --datadir=#{datadir}"
+  command "mysql_install_db --defaults-file=#{percona["main_config_file"]} --user=#{user}" # rubocop:disable LineLength
   not_if "test -f #{datadir}/mysql/user.frm"
+  action :nothing
 end
 
 # install SSL certificates before config phase
@@ -98,6 +109,7 @@ template percona["main_config_file"] do
   group "root"
   mode "0644"
 
+  notifies :run, "execute[setup mysql datadir]", :immediately
   if node["percona"]["auto_restart"]
     notifies :restart, "service[mysql]", :immediately
   end
@@ -108,7 +120,7 @@ unless node["percona"]["skip_passwords"]
   execute "Update MySQL root password" do
     root_pw = passwords.root_password
     command "mysqladmin --user=root --password='' password '#{root_pw}'"
-    not_if "test -f /etc/mysql/grants.sql"
+    only_if "mysqladmin --user=root --password='' ping"
   end
 end
 

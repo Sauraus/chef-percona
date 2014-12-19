@@ -43,10 +43,10 @@ cause, and we'll make reasonable efforts to improve support:
 
 ### Cookbooks
 
-* [apt](http://community.opscode.com/cookbooks/apt) Opscode LWRP Cookbook
-* [openssl](http://community.opscode.com/cookbooks/openssl) Opscode Cookbook
-* [yum](http://community.opscode.com/cookbooks/yum) Opscode LWRP Cookbook
-* [yum-epel] (https://supermarket.getchef.com/cookbooks/yum-epel) Opscode Cookbook
+* [apt](https://supermarket.getchef.com/cookbooks/apt) Chef LWRP Cookbook
+* [openssl](https://supermarket.getchef.com/cookbooks/openssl) Chef Cookbook
+* [yum](https://supermarket.getchef.com/cookbooks/yum) Chef LWRP Cookbook
+* [yum-epel](https://supermarket.getchef.com/cookbooks/yum-epel) Chef LWRP Cookbook
 
 ### Chef
 
@@ -297,6 +297,7 @@ default["percona"]["server"]["thread_cache_size"]               = 16
 default["percona"]["server"]["back_log"]                        = 50
 default["percona"]["server"]["max_connections"]                 = 30
 default["percona"]["server"]["max_connect_errors"]              = 9999999
+default["percona"]["server"]["sql_modes"]                       = []
 default["percona"]["server"]["table_cache"]                     = 8192
 default["percona"]["server"]["group_concat_max_len"]            = 4096
 default["percona"]["server"]["expand_fast_index_creation"]      = false
@@ -346,12 +347,19 @@ default["percona"]["server"]["innodb_max_dirty_pages_pct"]      = 80
 default["percona"]["server"]["innodb_flush_method"]             = "O_DIRECT"
 default["percona"]["server"]["innodb_lock_wait_timeout"]        = 120
 
+# Performance Schema
+default["percona"]["server"]["performance_schema"]              = false
+
 # Replication Settings
 default["percona"]["server"]["replication"]["read_only"]        = false
 default["percona"]["server"]["replication"]["host"]             = ""
 default["percona"]["server"]["replication"]["username"]         = ""
 default["percona"]["server"]["replication"]["password"]         = ""
 default["percona"]["server"]["replication"]["port"]             = 3306
+default["percona"]["server"]["replication"]["ignore_db"]        = []
+default["percona"]["server"]["replication"]["ignore_table"]     = []
+default["percona"]["server"]["replication"]["ssl_enabled"]      = false
+default["percona"]["server"]["replication"]["suppress_1592"]    = false
 
 # XtraBackup Settings
 default["percona"]["backup"]["configure"]                       = false
@@ -585,6 +593,24 @@ Many thanks go to the following [contributors](https://github.com/phlipper/chef-
 * **[@ajardan](https://github.com/ajardan)**
     * support master-master replication in the `replication_master.sql` template
     * extend master-master capabilities and add ssl support
+* **[@realloc](https://github.com/realloc)**
+    * add `mysql2` gem provider
+* **[@tbunnyman](https://github.com/tbunnyman)**
+    * make `ignore_db` attribute into an array & add matching `ignore_table` attribute
+    * add `suppress_1592` replication attribute
+    * add `sql_modes` attribute
+* **[@mzdrale](https://github.com/mzdrale)**
+    * fix cluster package name on RHEL systems
+* **[@Sauraus](https://github.com/Sauraus)**
+    * fix cluster dependency package installation on RHEL systems
+    * fix `slow_query_logdir` path creation
+* **[@jim80net](https://github.com/jim80net)**
+    * fix toolkit installation for version 5.6 on RHEL systems
+* **[@helgi](https://github.com/helgi)**
+    * use `mysql` command vs. a file to check the root password
+    * generate configuration file before setting up data directory
+    * ensure `includedir` is created if provided
+    * add attribute `performance_schema`
 
 
 ## License

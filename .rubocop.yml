@@ -7,8 +7,12 @@ LineLength:
 StringLiterals:
   EnforcedStyle: double_quotes
 
+StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
 PercentLiteralDelimiters:
   PreferredDelimiters:
+    "%r": "()"
     "%w": "[]"  # Arrays use brackets
     "%W": "[]"  # Arrays use brackets
 

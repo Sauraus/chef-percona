@@ -3,12 +3,13 @@ require "spec_helper"
 describe "percona::configure_server" do
   describe "first run" do
     let(:chef_run) do
-      ChefSpec::Runner.new.converge(described_recipe)
+      ChefSpec::SoloRunner.new.converge(described_recipe)
     end
 
     before do
       stub_command("test -f /var/lib/mysql/mysql/user.frm").and_return(false)
-      stub_command("test -f /etc/mysql/grants.sql").and_return(false)
+      stub_command("mysqladmin --user=root --password='' ping")
+        .and_return(true)
     end
 
     it "creates the main server config file" do
@@ -18,7 +19,12 @@ describe "percona::configure_server" do
         mode: "0644"
       )
 
+      expect(chef_run).to render_file("/etc/mysql/my.cnf").with_content(
+        "performance_schema=OFF"
+      )
+
       resource = chef_run.template("/etc/mysql/my.cnf")
+      expect(resource).to notify("execute[setup mysql datadir]").to(:run).immediately  # rubocop:disable LineLength
       expect(resource).to notify("service[mysql]").to(:restart).immediately
     end
 
@@ -30,8 +36,9 @@ describe "percona::configure_server" do
       )
     end
 
-    it "sets up the data directory" do
-      expect(chef_run).to run_execute("setup mysql datadir")
+    it "defines the setup for the data directory" do
+      resource = chef_run.execute("setup mysql datadir")
+      expect(resource).to do_nothing
     end
 
     it "creates the log directory" do
@@ -50,6 +57,14 @@ describe "percona::configure_server" do
       )
     end
 
+    it "creates the configuration include directory" do
+      expect(chef_run).to create_directory("/etc/mysql/conf.d/").with(
+        owner: "mysql",
+        group: "mysql",
+        recursive: true
+      )
+    end
+
     it "updates the root user password" do
       expect(chef_run).to run_execute("Update MySQL root password")
     end
@@ -57,18 +72,21 @@ describe "percona::configure_server" do
 
   describe "subsequent runs" do
     let(:chef_run) do
-      ChefSpec::Runner.new do |node|
+      ChefSpec::SoloRunner.new do |node|
         node.set["percona"]["main_config_file"] = "/mysql/my.cnf"
         node.set["percona"]["server"]["root_password"] = "s3kr1t"
         node.set["percona"]["server"]["debian_password"] = "d3b1an"
+        node.set["percona"]["server"]["performance_schema"] = true
         node.set["percona"]["conf"]["mysqld"]["datadir"] = "/mysql/data"
         node.set["percona"]["conf"]["mysqld"]["tmpdir"] = "/mysql/tmp"
+        node.set["percona"]["conf"]["mysqld"]["includedir"] = "/mysql/conf.d"
       end.converge(described_recipe)
     end
 
     before do
       stub_command("test -f /mysql/data/mysql/user.frm").and_return(true)
-      stub_command("test -f /etc/mysql/grants.sql").and_return(true)
+      stub_command("mysqladmin --user=root --password='' ping")
+        .and_return(false)
     end
 
     it "creates a `.my.cnf` file for root" do
@@ -105,12 +123,29 @@ describe "percona::configure_server" do
       )
     end
 
+    it "creates the configuration include directory" do
+      expect(chef_run).to create_directory("/mysql/conf.d").with(
+        owner: "mysql",
+        group: "mysql",
+        recursive: true
+      )
+    end
+
+    it "creates the slow query log directory" do
+      expect(chef_run).to create_directory("/var/log/mysql").with(
+        owner: "mysql",
+        group: "mysql",
+        recursive: true
+      )
+    end
+
     it "manages the `mysql` service" do
       expect(chef_run).to enable_service("mysql")
     end
 
-    it "does not setup the data directory" do
-      expect(chef_run).to_not run_execute("setup mysql datadir")
+    it "defines the setup for the data directory" do
+      resource = chef_run.execute("setup mysql datadir")
+      expect(resource).to do_nothing
     end
 
     it "creates the main server config file" do
@@ -120,7 +155,12 @@ describe "percona::configure_server" do
         mode: "0644"
       )
 
+      expect(chef_run).to render_file("/mysql/my.cnf").with_content(
+        "performance_schema=ON"
+      )
+
       resource = chef_run.template("/mysql/my.cnf")
+      expect(resource).to notify("execute[setup mysql datadir]").to(:run).immediately # rubocop:disable LineLength
       expect(resource).to notify("service[mysql]").to(:restart).immediately
     end
 
@@ -147,12 +187,13 @@ describe "percona::configure_server" do
   describe "`rhel` platform family" do
     let(:chef_run) do
       env_options = { platform: "centos", version: "6.5" }
-      ChefSpec::Runner.new(env_options).converge(described_recipe)
+      ChefSpec::SoloRunner.new(env_options).converge(described_recipe)
     end
 
     before do
       stub_command("test -f /var/lib/mysql/mysql/user.frm").and_return(false)
-      stub_command("test -f /etc/mysql/grants.sql").and_return(false)
+      stub_command("mysqladmin --user=root --password='' ping")
+        .and_return(true)
     end
 
     it "creates the main server config file" do
@@ -163,7 +204,12 @@ describe "percona::configure_server" do
       )
 
       resource = chef_run.template("/etc/my.cnf")
+      expect(resource).to notify("execute[setup mysql datadir]").to(:run).immediately # rubocop:disable LineLength
       expect(resource).to notify("service[mysql]").to(:restart).immediately
+    end
+
+    it "does not create the configuration include directory" do
+      expect(chef_run).to_not create_directory("/mysql/conf.d")
     end
   end
 end
