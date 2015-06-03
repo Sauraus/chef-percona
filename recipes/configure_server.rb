@@ -81,7 +81,6 @@ directory tmpdir do
   recursive true
 end
 
-<<<<<<< HEAD
 # setup the configuration include directory
 unless includedir.empty?  # ~FC023
   directory includedir do # don't evaluate an empty `directory` resource
@@ -91,17 +90,12 @@ unless includedir.empty?  # ~FC023
   end
 end
 
-=======
->>>>>>> Fix slow_query_logdir path creation
 # setup slow_query_logdir directory
 directory slow_query_logdir do
   owner user
   group user
   recursive true
-<<<<<<< HEAD
   not_if { slow_query_logdir.eql? logdir }
-=======
->>>>>>> Fix slow_query_logdir path creation
 end
 
 # define the service
