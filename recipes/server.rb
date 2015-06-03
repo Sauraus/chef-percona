@@ -47,4 +47,3 @@ end
 if node["percona"]['enable_pamauth']
   include_recipe "percona::pam_auth"
 end
-

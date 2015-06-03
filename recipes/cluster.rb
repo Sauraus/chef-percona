@@ -36,8 +36,8 @@ when "rhel"
     not_if "rpm -qa | grep -q '#{node["percona"]["cluster"]["package"]}'"
   end
 
-  # This is required for `socat` per:
-  # www.percona.com/doc/percona-xtradb-cluster/5.6/installation/yum_repo.html
+  # This is required for 'socat' per: http://www.percona.com/doc/percona-xtradb-cluster/5.6/installation/yum_repo.html
+  # not only for 5.6 but also 5.5 has this dependency.
   include_recipe "yum-epel"
 
   # This follows the originals posters workaround found here: https://bugs.launchpad.net/percona-toolkit/+bug/1031427
