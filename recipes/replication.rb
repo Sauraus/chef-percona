@@ -22,8 +22,10 @@ template replication_sql do
   end
 end
 
-root_pass = passwords.root_password.to_s
-root_pass = Shellwords.escape(root_pass).prepend("-p") unless root_pass.empty?
+unless node["percona"]["skip_passwords"]
+  root_pass = passwords.root_password.to_s
+  root_pass = Shellwords.escape(root_pass).prepend("-p") unless root_pass.empty?
+end
 
 execute "mysql-set-replication" do  # ~FC009 - `sensitive`
   command "/usr/bin/mysql #{root_pass} < #{replication_sql}"

@@ -36,3 +36,10 @@ begin
 rescue LoadError
   task("kitchen:all") { puts "Unable to run `test-kitchen`" }
 end
+
+begin
+  require "kitchen/rake_tasks"
+  Kitchen::RakeTasks.new
+rescue LoadError
+  puts ">>>>> Kitchen gem not loaded, omitting tasks" unless ENV["CI"]
+end

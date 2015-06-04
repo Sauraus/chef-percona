@@ -39,7 +39,6 @@ unless node["percona"]["skip_configure"]
 end
 
 # access grants
-unless node["percona"]["skip_passwords"]
-  include_recipe "percona::access_grants"
-  include_recipe "percona::replication"
-end
+include_recipe "percona::access_grants" unless node["percona"]["skip_passwords"]
+
+include_recipe "percona::replication"
