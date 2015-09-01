@@ -299,6 +299,9 @@ replicate-ignore-table = <%= ignore_table %>
 <% end -%>
 <% end -%>
 
+<% if node["percona"]["server"]["replication"]["suppress_1062"] %>
+slave-skip-errors = 1062
+<% end %>
 
 <% if node["percona"]["server"]["replication"]["suppress_1592"] %>
 #turns off this statement is unsafe in statement-based replication

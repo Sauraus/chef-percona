@@ -177,9 +177,13 @@ default["percona"]["server"]["replication"]["ignore_db"] = []
 default["percona"]["server"]["replication"]["ignore_table"] = []
 default["percona"]["server"]["replication"]["ssl_enabled"] = false
 default["percona"]["server"]["replication"]["suppress_1592"] = false
+default["percona"]["server"]["replication"]["suppress_1062"] = false
 default["percona"]["server"]["replication"]["skip_slave_start"] = false
 default["percona"]["server"]["replication"]["replication_sql"] = "/etc/mysql/replication.sql"
 default["percona"]["server"]["replication"]["slave_transaction_retries"] = 10
+default["percona"]["server"]["replication"]["master_log_pos"] = nil
+default["percona"]["server"]["replication"]["master_log_file"] = ''
+default["percona"]["server"]["replication"]["master_dump"] = ''
 
 # XtraBackup Settings
 default["percona"]["backup"]["configure"] = false

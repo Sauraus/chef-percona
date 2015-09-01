@@ -57,7 +57,6 @@ slow_query_logdir = mysqld["slow_query_logdir"] || server["slow_query_logdir"]
 directory "/etc/mysql" do
   owner "root"
   group "root"
-  mode "0755"
 end
 
 # setup the data directory
@@ -68,8 +67,7 @@ directory datadir do
 end
 
 # setup the log directory
-directory "log directory" do
-  path logdir
+directory logdir do
   owner user
   group user
   recursive true
@@ -107,12 +105,10 @@ service "mysql" do
 end
 
 # install db to the data directory
-unless node["percona"]["skip_install_db"]
-  execute "setup mysql datadir" do
-    command "mysql_install_db --defaults-file=#{percona["main_config_file"]} --user=#{user}" # rubocop:disable LineLength
-    not_if "test -f #{datadir}/mysql/user.frm"
-    action :nothing
-  end
+execute "setup mysql datadir" do
+  command "mysql_install_db --defaults-file=#{percona["main_config_file"]} --user=#{user}" # rubocop:disable LineLength
+  not_if { ::File.exist?(::File.join(datadir, 'mysql', 'user.frm')) }
+  action :nothing
 end
 
 # install SSL certificates before config phase
@@ -131,10 +127,8 @@ template percona["main_config_file"] do
   group "root"
   mode "0644"
   sensitive true
-  notifies :run, "execute[setup mysql datadir]", :immediately
-  if node["percona"]["auto_restart"]
-    notifies :restart, "service[mysql]", :immediately
-  end
+  notifies :run, "execute[setup mysql datadir]", :immediately unless node["percona"]["skip_install_db"]
+  notifies :restart, "service[mysql]", :immediately if node["percona"]["auto_restart"]
 end
 
 # now let's set the root password only if this is the initial install
